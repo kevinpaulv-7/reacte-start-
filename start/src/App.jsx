@@ -131,7 +131,7 @@ const App=()=>{
   const  [data,setData]=useState([])
    useEffect(()=>{
     const fetchdata=async ()=>{
-      const response = await fetch("https://jsonplaceholder.typicode.com/users");
+      const response = await fetch("https://github.com/kevinpaulv-7/cars-api");
       const data =  await response.json();
       setData(data);
     };
