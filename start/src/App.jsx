@@ -131,7 +131,7 @@ const App=()=>{
   const  [data,setData]=useState([])
    useEffect(()=>{
     const fetchdata=async ()=>{
-      const response = await fetch("https://github.com/kevinpaulv-7/cars-api");
+      const response = await fetch("https://jsonplaceholder.typicode.com/users");
       const data =  await response.json();
       setData(data);
     };
@@ -142,6 +142,7 @@ const App=()=>{
    return(
   <div>
     <h1 className='hi'>Welcome to my Webpage </h1>
+    
     {/* <img src={Photo} alt="main" classNmae='image'></img>
     <Button  name={"Hello all"} onClick={()=>alert("button is clicked")}/>
     <label>Counter: {counter}</label>

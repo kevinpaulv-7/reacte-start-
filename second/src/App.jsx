@@ -6,40 +6,51 @@ function App() {
   const [flippedCar, setFlippedCar] = useState(null);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
-  const [target,setTarget]=useState('');
+  const [searchText, setSearchText] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   
   useEffect(() => {
-    let ignore=false;
+    let ignore = false;
     const fetchData = async () => {
+      setLoading(true);
+      setError('');
       try {
-        const response = await fetch('/api/v1/vehicles/?page=1&per_page=15');
+        const response = await fetch(`/api/v1/vehicles/?page=${currentPage}&per_page=15`);
         const result = await response.json();
-        
+
         if (!response.ok) {
-          throw new Error('Could not get the cars from the API.');
-        }
-        if (response.status===200){
-          console.log("status ok");
-        }else if(response.status===502){
-          console.log("chech ur network");
-        }else if(response.status===404){
-          console.log("page not found");
-        }else{
-          console.log("error");
+          throw new Error(`Request failed (${response.status}). Please try again.`);
         }
 
-        setData(result.results.cars);
+        if (!Array.isArray(result.results?.cars)) {
+          throw new Error('The API response did not include a car list.');
+        }
+
+        if (!ignore) {
+          setData(result.results.cars);
+          setTotalPages(result.results.total_pages || 1);
+        }
       } catch (error) {
-        setError(error.message);
+        if (!ignore) setError(error.message || 'Could not load vehicles.');
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     };
 
     fetchData();
-    return () =>{ignore=true;};
-  }, []);
-  console.log(data,'data');
+    return () => { ignore = true; };
+  }, [currentPage]);
+
+  const filteredData = data.filter((item) => {
+    const carInfo = `${item.make} ${item.model} ${item.loc} ${item.dealer}`.toLowerCase();
+    return carInfo.includes(searchText.trim().toLowerCase());
+  });
+
+  const handleSearch = (event) => {
+    event.preventDefault();
+    setCurrentPage(1);
+  };
 
   return (
     <main className="page">
@@ -48,15 +59,30 @@ function App() {
         <h1>Find your next car</h1>
         <p className="subtitle">Browse our available vehicles.</p>
       </header>
-      <input value={target} onChange={(e)=>setTarget(e.target.value)}></input>
-      <label>{target}</label>
+      <form className="search-form" onSubmit={handleSearch}>
+        <label htmlFor="vehicle-search">Search vehicles on this page</label>
+        <div className="search-controls">
+          <input
+            id="vehicle-search"
+            type="search"
+            value={searchText}
+            onChange={(event) => setSearchText(event.target.value)}
+            placeholder="Try make, model, or location"
+          />
+          <button className="search-button" type="submit">Search</button>
+        </div>
+      </form>
 
       {error && <p className="notice error">Could not load vehicles: {error}</p>}
       {loading && <p className="notice">Loading vehicles...</p>}
-      {!loading && !error && data.length === 0 && <p className="notice">No vehicles found.</p>}
+      {!loading && !error && filteredData.length === 0 && (
+        <p className="notice">
+          {searchText ? 'No vehicles match your search on this page.' : 'No vehicles found.'}
+        </p>
+      )}
 
       <section className="vehicle-grid">
-        {data.map((item) => {
+        {!loading && !error && filteredData.map((item) => {
           const isFlipped = flippedCar === item.row_id;
           const carName = `${item.make} ${item.model}`;
 
@@ -121,6 +147,28 @@ function App() {
           );
         })}
       </section>
+
+      {!loading && !error && totalPages > 1 && (
+        <div className="pagination" aria-label="Vehicle pages">
+          <button
+            className="page-button"
+            type="button"
+            onClick={() => setCurrentPage(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </button>
+          <span>Page {currentPage} of {totalPages}</span>
+          <button
+            className="page-button"
+            type="button"
+            onClick={() => setCurrentPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </main>
   );
 }
