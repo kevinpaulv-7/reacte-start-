@@ -142,15 +142,15 @@ function App() {
 
           <section className="summary-row" aria-label="Directory summary">
             <div className="summary-card">
-              <div className="summary-icon people-icon">♧</div>
+              <div className="summary-icon people-icon"></div>
               <div><span>Total people</span><strong>{isLoading ? '—' : users.length}</strong></div>
               <span className="summary-note">in directory</span>
             </div>
-            <div className="summary-card">
+            {/* <div className="summary-card">
               <div className="summary-icon team-icon">⌂</div>
               <div><span>Teams represented</span><strong>{isLoading ? '—' : new Set(users.map((user) => user.company?.name)).size}</strong></div>
               <span className="summary-note">across the org</span>
-            </div>
+            </div> */}
           </section>
 
           <section className="directory-card">

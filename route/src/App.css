@@ -1,0 +1,28 @@
+.app-shell {
+  min-height: 100vh;
+  color: inherit;
+  background: inherit;
+}
+
+.app-content {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: top;
+  gap: 16px;
+  padding: 24px;
+}
+
+.app-content h1 {
+  margin: 0;
+}
+
+.app-content button {
+  padding: 8px 14px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
